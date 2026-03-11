@@ -16,6 +16,10 @@ export class FollowService {
 	) {}
 
 	public async subscribe(followerId: ObjectId, followingId: ObjectId): Promise<Follower> {
+		console.log('FollowService.subscribe - request:', {
+			followerId: String(followerId),
+			followingId: String(followingId),
+		});
 		if (followerId.toString() === followingId.toString()) {
 			throw new InternalServerErrorException(Message.SWLF_SUBSCRIPTION_DENIED);
 		}
@@ -24,6 +28,12 @@ export class FollowService {
 		if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 		const result = await this.registerSubscription(followerId, followingId);
+
+		console.log('FollowService.subscribe - created:', {
+			_id: String(result._id),
+			followerId: String(result.followerId),
+			followingId: String(result.followingId),
+		});
 
 		await this.memberService.memberStatusEditor({ _id: followerId, targetKey: 'memberFollowings', modifier: 1 });
 		await this.memberService.memberStatusEditor({ _id: followingId, targetKey: 'memberFollowers', modifier: 1 });
@@ -44,6 +54,10 @@ export class FollowService {
 	}
 
 	public async unsubscribe(followerId: ObjectId, followingId: ObjectId): Promise<Follower> {
+		console.log('FollowService.unsubscribe - request:', {
+			followerId: String(followerId),
+			followingId: String(followingId),
+		});
 		const targetMember = await this.memberService.getMember(null, followingId);
 		if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
@@ -53,6 +67,12 @@ export class FollowService {
 		}).exec();
 		
 		if (!result) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		console.log('FollowService.unsubscribe - removed:', {
+			_id: String(result._id),
+			followerId: String(result.followerId),
+			followingId: String(result.followingId),
+		});
 
 		await this.memberService.memberStatusEditor({ _id: followerId, targetKey: 'memberFollowings', modifier: -1 });
 		await this.memberService.memberStatusEditor({ _id: followingId, targetKey: 'memberFollowers', modifier: -1 });

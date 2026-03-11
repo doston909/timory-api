@@ -26,7 +26,18 @@ export class CommentService {
 
 		let result = null;
 		try {
+			console.log('CommentService.createComment - input:', {
+				memberId: String(memberId),
+				commentGroup: input.commentGroup,
+				commentRefId: String(input.commentRefId),
+			});
 			result = await this.commentModel.create(input);
+			console.log('CommentService.createComment - created:', {
+				_id: String(result._id),
+				commentGroup: result.commentGroup,
+				commentRefId: String(result.commentRefId),
+				createdAt: result.createdAt,
+			});
 		} catch (err) {
 			console.log('Error, Service.model:', err.message);
 			throw new BadRequestException(Message.CREATE_FAILED);
@@ -65,6 +76,14 @@ export class CommentService {
 		const update: T = { updatedAt: new Date() };
 		if (commentContent !== undefined) update.commentContent = commentContent;
 		if (commentStatus !== undefined) update.commentStatus = commentStatus;
+
+		console.log('CommentService.updateComment - input:', {
+			memberId: String(memberId),
+			_id: String(_id),
+			hasContent: commentContent !== undefined,
+			hasStatus: commentStatus !== undefined,
+		});
+
 		const result = await this.commentModel.findOneAndUpdate(
 			{
 				_id: _id,
@@ -77,12 +96,25 @@ export class CommentService {
 			},
 		).exec();
 
+		if (result) {
+			console.log('CommentService.updateComment - updated:', {
+				_id: String(result._id),
+				commentStatus: result.commentStatus,
+				updatedAt: result.updatedAt,
+			});
+		}
+
 		if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 		return result;
 	}
 
 	/** Faqat comment yozgan member o‘z commentini o‘chira oladi (soft delete) */
 	public async removeComment(memberId: ObjectId, commentId: ObjectId): Promise<Comment> {
+		console.log('CommentService.removeComment - request:', {
+			memberId: String(memberId),
+			commentId: String(commentId),
+		});
+
 		const comment = await this.commentModel
 			.findOne({ _id: commentId, memberId: memberId, commentStatus: CommentStatus.ACTIVE })
 			.lean()
@@ -96,6 +128,14 @@ export class CommentService {
 				{ new: true },
 			)
 			.exec();
+
+		if (result) {
+			console.log('CommentService.removeComment - removed (soft):', {
+				_id: String(result._id),
+				commentStatus: result.commentStatus,
+			});
+		}
+
 		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
 
 		switch (comment.commentGroup) {

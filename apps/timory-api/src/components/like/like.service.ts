@@ -22,10 +22,20 @@ export class LikeService {
 		let modifier = 1;
 
 		if (exist) {
+			console.log('LikeService.toggleLike - UNLIKE:', {
+				memberId: String(memberId),
+				likeRefId: String(likeRefId),
+				likeGroup,
+			});
 			await this.likeModel.findOneAndDelete(search).exec();
 			modifier = -1;
 		} else {
 			try {
+				console.log('LikeService.toggleLike - LIKE:', {
+					memberId: String(memberId),
+					likeRefId: String(likeRefId),
+					likeGroup,
+				});
 				await this.likeModel.create(input);
 			} catch (err) {
 				console.log('Error, Service.model:', err.message);

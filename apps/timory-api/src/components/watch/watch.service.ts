@@ -84,6 +84,11 @@ export class WatchService {
 
 	public async watchStatusEditor(input: StatisticModifier): Promise<Watch> {
 		const { _id, targetKey, modifier } = input;
+		console.log('WatchService.watchStatusEditor:', {
+			_id: String(_id),
+			targetKey,
+			modifier,
+		});
 		return await this.watchModel
 			.findByIdAndUpdate(
 				_id,
@@ -287,6 +292,11 @@ export class WatchService {
 			likeRefId: likeRefId,
 			likeGroup: LikeGroup.WATCH,
 		};
+
+		console.log('WatchService.likeTargetWatch - request:', {
+			memberId: String(memberId),
+			likeRefId: String(likeRefId),
+		});
 
 		const modifier: number = await this.likeService.toggleLike(input);
 		const result = await this.watchStatusEditor({ _id: likeRefId, targetKey: 'watchLikes', modifier: modifier });

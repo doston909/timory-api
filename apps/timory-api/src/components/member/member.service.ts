@@ -317,6 +317,11 @@ export class MemberService {
 
 	public async memberStatusEditor(input: StatisticModifier): Promise<Member> {
 		const { _id, targetKey, modifier } = input;
+		console.log('MemberService.memberStatusEditor:', {
+			_id: String(_id),
+			targetKey,
+			modifier,
+		});
 		return await this.memberModel
 			.findByIdAndUpdate(
 				_id,
