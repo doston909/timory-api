@@ -7,6 +7,9 @@ services:
    image: node:20.10.0
    ports:
     - 4001:3003
+   environment:
+    # main.ts: app.listen(process.env.PORT_API ?? 3000) — mapping 3003 bilan mos bo‘lsin
+    - PORT_API=3003
    volumes:
     - ./:/usr/src/timory
    working_dir: /usr/src/timory
@@ -25,6 +28,8 @@ services:
    image: node:20.10.0
    ports:
     - 4002:3004
+   environment:
+    - PORT_BATCH=3004
    volumes:
     - ./:/usr/src/timory
    working_dir: /usr/src/timory
